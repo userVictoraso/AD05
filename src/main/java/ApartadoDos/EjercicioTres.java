@@ -7,10 +7,11 @@ import org.xmldb.api.modules.XPathQueryService;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class EjercicioDos {
+public class EjercicioTres {
 
-    /**Se quiere saber que libros están prestados actualmente. Para ello añade el elemento prestado
-     * con valor válido para el rango de libros prestados e invalido para el rango de libros devueltos.**/
+    /**
+     * Actualiza el elemento prestado creado en el paso anterior por un valor distinto.
+     **/
 
     public static void main(String[] args) throws ClassNotFoundException, XMLDBException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class cl = Class.forName(Conexion.DRIVER);
@@ -24,16 +25,7 @@ public class EjercicioDos {
             col = DatabaseManager.getCollection(Conexion.URI + Conexion.COLLECTION, Conexion.USERNAME, Conexion.PASSWORD);
             XPathQueryService xpqs = (XPathQueryService) col.getService("XPathQueryService", "1.0");
             xpqs.setProperty("indent", "yes");
-            ResourceSet result = xpqs.query("/libros/libro");
-            ResourceIterator i = result.getIterator();
-            Resource res = null;
-            int iterator = 0;
-            while (i.hasMoreResources()) {
-                iterator++;
-                res = i.nextResource();
-                System.out.println(res.getContent());
-                result = xpqs.query("update insert " + "<prestado>" + getCondition() + "</prestado> into /libros/libro[position()= " + iterator +"]");
-            }
+            ResourceSet result = xpqs.query("update value //libros/libro[id = 7]/prestado with 'invalido'");
         } finally {
             if (col != null) {
                 try {
@@ -43,16 +35,5 @@ public class EjercicioDos {
                 }
             }
         }
-    }
-    private static String getCondition() {
-        String condition = "no disponible";
-        int random = (int) ((Math.random() * 10) + 1);
-        if(random <=5){
-            condition = "valido";
-        }
-        if(random >6){
-            condition = "invalido";
-        }
-        return condition;
     }
 }

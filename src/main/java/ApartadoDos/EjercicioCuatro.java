@@ -7,10 +7,9 @@ import org.xmldb.api.modules.XPathQueryService;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class EjercicioDos {
+public class EjercicioCuatro {
 
-    /**Se quiere saber que libros están prestados actualmente. Para ello añade el elemento prestado
-     * con valor válido para el rango de libros prestados e invalido para el rango de libros devueltos.**/
+    /**Actualiza el elemento prestado de todos los libros para que pase a llamarse enprestamo.**/
 
     public static void main(String[] args) throws ClassNotFoundException, XMLDBException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class cl = Class.forName(Conexion.DRIVER);
@@ -24,15 +23,15 @@ public class EjercicioDos {
             col = DatabaseManager.getCollection(Conexion.URI + Conexion.COLLECTION, Conexion.USERNAME, Conexion.PASSWORD);
             XPathQueryService xpqs = (XPathQueryService) col.getService("XPathQueryService", "1.0");
             xpqs.setProperty("indent", "yes");
-            ResourceSet result = xpqs.query("/libros/libro");
+            ResourceSet result = xpqs.query("//libros/libro/titulo");
             ResourceIterator i = result.getIterator();
             Resource res = null;
-            int iterator = 0;
+            int iterator = 1;
             while (i.hasMoreResources()) {
                 iterator++;
                 res = i.nextResource();
                 System.out.println(res.getContent());
-                result = xpqs.query("update insert " + "<prestado>" + getCondition() + "</prestado> into /libros/libro[position()= " + iterator +"]");
+                result = xpqs.query("update value //libros/libro/prestado with 'enprestamo'");
             }
         } finally {
             if (col != null) {
@@ -43,16 +42,5 @@ public class EjercicioDos {
                 }
             }
         }
-    }
-    private static String getCondition() {
-        String condition = "no disponible";
-        int random = (int) ((Math.random() * 10) + 1);
-        if(random <=5){
-            condition = "valido";
-        }
-        if(random >6){
-            condition = "invalido";
-        }
-        return condition;
     }
 }
