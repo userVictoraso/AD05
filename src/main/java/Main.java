@@ -28,7 +28,7 @@ public class Main {
             col = DatabaseManager.getCollection(URI + COLLECTION, USERNAME, PASSWORD);
             XPathQueryService xpqs = (XPathQueryService) col.getService("XPathQueryService", "1.0");
             xpqs.setProperty("indent", "yes");
-            ResourceSet result = xpqs.query(queryFiveAp2());
+            ResourceSet result = xpqs.query(queryFourAp2());
             ResourceIterator i = result.getIterator();
             Resource res = null;
             while (i.hasMoreResources()) {
@@ -63,8 +63,8 @@ public class Main {
 
     private static String queryOneAp2() {
         /**Actualiza el año de edición del libro cuyo id es 2.**/
-        //TODO
-        String query = "update value //publicacion[. = 1603 and ./id/text() = 2] with 1700";
+        //TODO update value //publicacion [id = 2] with 1700
+        String query = "update value //publicacion[. = 1997] with 1777";
         return query;
     }
 
@@ -86,7 +86,7 @@ public class Main {
     private static String queryFourAp2() {
         /**Actualiza el elemento prestado de todos los libros para que pase a llamarse enprestamo.**/
         //TODO
-        String query = "update replace //prestado with 'enprestamo'";
+        String query = "update replace //prestado[. = 0 and . = 1] with 'enprestamo'";
         return query;
     }
 
