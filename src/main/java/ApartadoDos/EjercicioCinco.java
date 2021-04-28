@@ -11,11 +11,16 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class EjercicioCinco {
 
-    /** Borra un libro cuya fecha del último préstamo sea anterior al año 2005. **/
-
+    /**
+     * Borra un libro cuya fecha del último préstamo sea anterior al año 2005.
+     **/
+    private static String selectedID;
     public static void main(String[] args) throws ClassNotFoundException, XMLDBException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class cl = Class.forName(Conexion.DRIVER);
         Database database = (Database) cl.getDeclaredConstructor().newInstance();
@@ -42,8 +47,17 @@ public class EjercicioCinco {
                 JAXBContext jaxbContext = JAXBContext.newInstance(Prestamos.class);
                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                 Prestamos prestamos = (Prestamos) jaxbUnmarshaller.unmarshal(new StringReader(xmlStr));
-                System.out.println(prestamos.getPrestamo().get(5).getFechadevolucion());
-            } catch (JAXBException e) {
+                Date dateBefore = new SimpleDateFormat("dd-MM-yyyy").parse("31-12-2005");
+                Date dataReal;
+                selectedID = "0";
+                for (int k = 1; k < prestamos.getPrestamo().size(); k++) {
+                    dataReal = new SimpleDateFormat("dd-MM-yyyy").parse(prestamos.getPrestamo().get(k).getFechaprestamo());
+                    if (dataReal.before(dateBefore)) {
+                        selectedID = prestamos.getPrestamo().get(k).getLibro();
+                    }
+                }
+                ResourceSet resultDelete = xpqs.query("update delete //prestamos/prestamo[libro = " + selectedID + "]");
+            } catch (JAXBException | ParseException e) {
                 e.printStackTrace();
             }
         } finally {
